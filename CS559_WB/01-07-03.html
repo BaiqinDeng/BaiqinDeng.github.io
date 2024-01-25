@@ -1,0 +1,127 @@
+<!-- Written by: Amber Deng -->
+<!-- Attribution: CS559 Staff 2019-2023  -->
+
+<!DOCTYPE html>
+<html>
+
+<body>
+
+<p>
+    Here is <span id="ex3-span">some text to make change.</span> 
+</p>
+
+<script>
+const text = /** @type {HTMLElement}*/ (document.getElementById("ex3-span"));
+
+const colorList = [
+    { name: "Lavender",         rgb: [230, 230, 250] },
+    { name: "MediumPurple",     rgb: [147, 112, 219] },
+    { name: "DarkSlateBlue",    rgb: [ 72,  61, 139] },
+    { name: "Olive",            rgb: [128, 128,   0] },
+    { name: "Silver",           rgb: [192, 192, 192] },
+];
+
+let userRequest = [];    // a queue for collecting user's request
+
+colorList.forEach((_, i) => createButton(i));
+
+
+function createButton(cid) {
+    // create and cast a button object
+    const btn = /** @type {HTMLButtonElement} */ (document.createElement("button"));
+    document.body.appendChild(btn);  // append to HTML body
+
+    // each click append a new request to the `userRequest` queue
+    btn.onclick = () => {
+        console.log(`${colorList[cid].name} (click)`);
+        userRequest.push(cid);    
+    }
+
+    btn.textContent = colorList[cid].name;
+}
+
+// define variables for color update
+const lifespan = 2000;                // 2 sec is 2000 ms 
+let   lasttime = undefined;           // used for calculate `time delta`
+let   dbVal    = 0;                   // uded for find correct interpolation parameter
+
+const baseColor = [255, 255, 255];    // white color
+let   prevColor = baseColor;          // color in previous cycle
+let   nextColor = undefined;          // color in next cycle
+
+let pause = false;
+
+function update(currtime) {
+    if (lasttime === undefined) {
+        lasttime = currtime;          
+    }
+    // get `time delta` and update current `position` within each 2-sec cycle
+    const delta = pause ? 0 : (currtime - lasttime);
+    dbVal = (dbVal + delta) % lifespan;
+
+    // stage.1 color transition: previous color to white
+    if (dbVal < 500) {
+        const newColor = colorInterpolation(prevColor, baseColor, dbVal / 500);
+        text.style.backgroundColor = getRGB(newColor);
+    }
+
+    // stage.2 color transition: white to next color
+    else if (dbVal < 1000) {
+
+        // if next color is not picked
+        if (nextColor === undefined) {
+            // try to poll the earilest user's request
+            let k = userRequest.shift();
+
+            if (k !== undefined) {
+                // pick user selected color if possible
+                nextColor = colorList[k].rgb;
+                console.log(`${colorList[k].name} (serve)`);
+            }
+            else {
+                // otherwise, pick a random color
+                k = randomInt(0, colorList.length);
+                nextColor = colorList[k].rgb;
+                console.log(`${colorList[k].name} (random)`);
+            }
+        }
+
+        // update color
+        const newColor = colorInterpolation(baseColor, nextColor, (dbVal - 500) / 500);
+        text.style.backgroundColor = getRGB(newColor);
+    }
+
+    // stage.3 hold current color for 1 sec
+    else if (nextColor !== undefined) {
+        prevColor = nextColor;
+        text.style.backgroundColor = getRGB(prevColor);
+        nextColor = undefined;
+    }
+
+    window.requestAnimationFrame(update);
+    lasttime = currtime;
+}
+window.requestAnimationFrame(update);
+
+/**
+ * Convert an array of numbers to rgb string form
+ */
+function getRGB(color) {
+    return `rgb(${color[0]},${color[1]},${color[2]})`;
+}
+
+/**
+ * Color interpolation
+ */
+function colorInterpolation(c0, c1, t) {
+    return c0.map((v, i) => (v + (c1[i] - v) * t));
+}
+
+function randomInt(min, max) {
+    return min + Math.floor(Math.random() * (max - min));
+}
+
+</script>
+
+</body>
+
