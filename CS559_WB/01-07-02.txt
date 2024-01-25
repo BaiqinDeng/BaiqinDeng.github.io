@@ -1,0 +1,94 @@
+<!-- Written by: Amber Deng -->
+<!-- Attribution: CS559 Staff 2019-2023  -->
+
+<!DOCTYPE html>
+<html>
+
+<body>
+<p>
+    Here is <span id="ex3-span">some text to make change.</span>
+</p>
+
+<script>
+    const text = /** @type {HTMLElement}*/ (document.getElementById("ex3-span"));
+    let currentRunningButton = -1;
+
+    const redBtn    = createButton("Red", [255,0,0,1], 0);
+    const yellowBtn = createButton("Yellow", [255,255,0,1], 1);
+    const greenBtn  = createButton("Green", [0,255,0,1], 2);
+
+    function createButton(btnContent, color, bid) {
+        // 1, create and cast a button object
+        const btn = /** @type {HTMLButtonElement} */ (document.createElement("button"));
+        btn.textContent = btnContent;
+        document.body.appendChild(btn);
+
+        // 2, prepare 'local' variables for update function
+        const buttonID = bid;
+        const tgtColor = color;
+        let   srcColor = undefined;
+
+        const lifespan = 2000;       // 2000 ms = 2 second
+        let   lasttime = undefined;  
+        let   timer    = undefined;  // keep track of accumulate time
+        
+        // define update() function 
+        function update(currtime) {
+            if (lasttime === undefined) lasttime = currtime;
+
+            // update times
+            const delta = currtime - lasttime;
+            timer += delta;
+            
+            // update background with the interpolated color
+            const t = clamp(timer / lifespan, 0, 1);
+            const newColor = colorInterpolation(srcColor, tgtColor, t);
+            text.style.backgroundColor = getRGBa(newColor);
+
+            // timer is less than 2 sec, need next frame.
+            if (timer < 2000) {
+                window.requestAnimationFrame(update);
+                lasttime = currtime;
+            }
+        }
+
+        btn.onclick = () => {
+            text.innerHTML = `some text that will become ${btnContent.toUpperCase()}`;
+
+            // setup local variables for animation
+            timer = 0;
+            lasttime = undefined;
+            srcColor = extractRGBa(window.getComputedStyle(text, null).backgroundColor);
+            
+            window.requestAnimationFrame(update);
+        }
+        return btn;
+    }
+
+    function colorInterpolation(c0, c1, t) {
+        return c0.map((v,i) => (v + (c1[i] - v) * t));
+    }
+
+    function getRGBa(c) {
+        if (c.length == 4)
+            return `rgba(${c[0]},${c[1]},${c[2]},${c[3]})`;
+        else
+            return `rgb(${c[0]},${c[1]},${c[2]})`;
+    }
+
+    function extractRGBa(str) {
+        return str.replace(/[^\d,]/g, '')   // only keep digit-chars and comma
+                .split(',')               // split it by comma
+                .map(x => Number(x));     // map each string to a number
+    }
+
+    function clamp(num, min, max) {
+        if (num <= min) return min;
+        if (num >= max) return max;
+        return num;
+    }
+
+</script>
+
+</body>
+
