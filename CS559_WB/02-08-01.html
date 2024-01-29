@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>02-08-01</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+        svg {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="box2canvas" height="400" width="600"></canvas>
+    <script src="02-08-01.js" defer></script>
+
+    <!-- The screenshot and record buttons -->
+    <br><button onclick="screenshot('box2canvas')">Screenshot</button> <button
+        onclick="record('box2canvas','time')">Record</button> <input id="time" type="text" size="2" value="10"> seconds.
+    <script>
+        import { screenshot, record } from "saveCanvas.js";
+        window.screenshot = screenshot;
+        window.record = record;
+    </script>
+</body>
+</html>
+

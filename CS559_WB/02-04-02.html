@@ -1,0 +1,17 @@
+<html>
+<head>
+    <title>02-04-02</title>
+</head>
+<body>
+    <canvas id="canvas1" height="500" width="500"></canvas>
+    <script src="02-04-02.js" defer></script>
+
+    <br><button onclick="screenshot('canvas1')">Screenshot</button> <button
+        onclick="record('canvas1','time')">Record</button> <input id="time" type="text" size="2" value="10"> seconds.
+    <script>
+        import { screenshot, record } from "saveCanvas.js";
+        window.screenshot = screenshot;
+        window.record = record;
+    </script>
+</body>
+</html>
