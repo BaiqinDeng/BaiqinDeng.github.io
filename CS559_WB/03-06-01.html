@@ -1,0 +1,24 @@
+<!-- Attribution: CS559 2023_Spring solution  -->
+
+<!DOCTYPE html>
+<html>
+
+<head></head>
+
+<body>
+    <canvas id="canvas1" height="600px" width="600px"></canvas>
+
+    <script src="03-06-01.js" defer></script>
+
+    <br><button onclick="screenshot('canvas1')">Screenshot</button> <button
+        onclick="record('canvas1','time')">Record</button> <input id="time" type="text" size="2" value="10"> seconds.
+    <script type="module">
+        import { screenshot, record } from "../libs/CS559/saveCanvas.js";
+        window.screenshot = screenshot;
+        window.record = record;
+    </script>
+
+</body>
+
+</html>
+
