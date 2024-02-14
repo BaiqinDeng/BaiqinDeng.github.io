@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>WB4: Flock: Student Flocking Assignment</title>
+    <link rel="stylesheet" href="../libs/CS559/style559.css" />
+</head>
+
+<body>
+
+    <div style="padding:10px; border:1px solid black">
+
+        <canvas id="flockx" height="600px" width="600px" style="border:2px solid black"></canvas></br>
+        <button id="addx">Add 10</button><button id="clear">Clear</button></br>
+        <div>
+            <p></p>
+            <input type="checkbox" id="ckboxx" unchecked><label for="ckbox">Flocking Mode</label></br>
+            <p></p>
+            <span>speed</span></br>
+            <input type="range" width="100px" min="0" max="1" step=".01" value="0.5" id="speedx" /></br>
+            <span>alignment</span></br>
+            <input type="range" width="100px" min="0" max="1" step=".01" value="0.5" id="alignx" disabled="true"/></br>
+            <span>cohesion</span></br>
+            <input type="range" width="100px" min="0" max="1" step=".01" value="0.5" id="cohesx" disabled="true"/></br>
+            <span>separation</span></br>
+            <input type="range" width="100px" min="0" max="1" step=".01" value="0.5" id="separx" disabled="true"/></br>
+            <p></p>
+            <button id="resetx">Reset</button>
+            <p></p>
+        </div>
+        <span id="textx"></span>
+
+        <script src="04-05-01.js" defer></script>
+
+    </div>
+
+</body>
+
+</html>
