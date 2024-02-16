@@ -157,6 +157,20 @@ class Boid {
      * @param {CanvasRenderingContext2D} context 
      */
     draw(context) {
+        // Draw the body
+        const bodyRadius = 10; // Radius of the body
+        context.save();
+        context.translate(this.pos[0], this.pos[1]);
+        context.rotate(this.phi);
+        context.beginPath();
+        context.arc(0, 0, bodyRadius, 0, 2 * Math.PI, false);
+        context.fillStyle = 'red'; // Ladybugs are commonly red
+        context.fill();
+        context.lineWidth = 1;
+        context.strokeStyle = 'black';
+        context.stroke();
+        context.restore()
+        
         // points that determines the shape of bois
         const pts = [
             [3, 0], [0, 8], [-5, 1], [-18, 0.1],
@@ -183,26 +197,44 @@ class Boid {
     }
 
     drawLegs(context) {
-        const legLength = 10; // Length of the legs
-        const legWidth = 2; // Width of the legs
-        const cnt = 6;
-        const legSpread = 5; // Distance between legs
-        const legMovementPhase = (Date.now() / 100) % (2 * Math.PI); // Phase for leg movement to simulate walking
-
-        for (let i = 0; i < cnt; i++) {
-            const sideMultiplier = i % 2 === 0 ? 1 : -1; // Alternate legs on each side
-            const legAngle = Math.sin(legMovementPhase + i) * 0.2; // Simulate walking by oscillating the leg angle
+        const legLength = 6; 
+        const legWidth = 1; 
+        const numberOfLegs = 6; 
+        const bodyRadius = 10; 
+        const rotationRange = Math.PI / 6; 
+        // Get current time to create a walking animation
+        const time = Date.now() * 0.002;
+        
+        for (let i = 0; i < numberOfLegs; i++) {
+            const baseAngle = -Math.PI / 2; // Starting angle at the top of the circle
+            const angleOffset = Math.PI / 5; // 60 degrees in radians, offset for each leg on a side
+            const sideAdjustment = i < 3 ? 0 : Math.PI; // Adjust by 180 degrees for the other side
+            const legBaseAngle = baseAngle + (i % 3) * angleOffset + sideAdjustment;
+    
+            // Calculate the rotation for walking animation
+            const rotation = Math.sin(time + i) * rotationRange; // i is added to the time to desynchronize the leg movements
             
-            context.save();
-            context.rotate(legAngle * sideMultiplier); // Apply rotation for walking animation
-            context.fillStyle = Boid.color[Math.sign(this.bTmr)];
-
-            context.fillRect(-legSpread * (i/2), -legWidth / 2, legLength, legWidth); // Horizontal part of the leg
-            context.fillRect(-legSpread * (i/2) + legLength, -legWidth / 2, legLength / 2, legWidth); // Vertical part of the leg
-
-            context.restore();
+            // Calculate the actual angle of the leg considering its rotation
+            const legAngle = legBaseAngle + rotation;
+    
+            // Calculate the starting points for the legs on the body's perimeter
+            const startX = bodyRadius * Math.cos(legBaseAngle);
+            const startY = bodyRadius * Math.sin(legBaseAngle);
+    
+            // Calculate the end points for the legs considering the rotation
+            const endX = startX + legLength * Math.cos(legAngle);
+            const endY = startY + legLength * Math.sin(legAngle);
+    
+            context.beginPath();
+            context.moveTo(startX, startY); // Start at the edge of the body circle
+            context.lineTo(endX, endY); // Draw to the leg tip considering rotation
+            context.lineWidth = legWidth;
+            context.strokeStyle = "black";
+            context.stroke();
         }
-    }
+    }    
+    
+    
 }
 
 /** @type {Boid[]} */
