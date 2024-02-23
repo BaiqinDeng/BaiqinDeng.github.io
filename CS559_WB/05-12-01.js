@@ -17,7 +17,7 @@ function calculateBezierPoint(t, p0, p1, p2, p3) {
   const p012 = interpolate(p01, p12, t);
   const p123 = interpolate(p12, p23, t);
 
-  // Final level of 
+  // Final level
   const p0123 = interpolate(p012, p123, t);
 
   return p0123;
