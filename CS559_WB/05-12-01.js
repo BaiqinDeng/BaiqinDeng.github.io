@@ -7,23 +7,27 @@ if (!(canvas instanceof HTMLCanvasElement))
 let context = canvas.getContext("2d");
 
 
-function calculateHermitePoint(t, p0, p1, p2, p3) {
-  // Convert Bezier control points to Hermite endpoints and tangents
-  const h0 = p0; // Start point
-  const h1 = p3; // End point
-  const m0 = { x: 3 * (p1.x - p0.x), y: 3 * (p1.y - p0.y) }; // Tangent at start
-  const m1 = { x: 3 * (p3.x - p2.x), y: 3 * (p3.y - p2.y) }; // Tangent at end
+function calculateBezierPoint(t, p0, p1, p2, p3) {
+  // First level
+  const p01 = interpolate(p0, p1, t);
+  const p12 = interpolate(p1, p2, t);
+  const p23 = interpolate(p2, p3, t);
 
-  // Calculate Hermite point
-  const h = (2 * Math.pow(t, 3) - 3 * Math.pow(t, 2) + 1);
-  const t0 = (Math.pow(t, 3) - 2 * Math.pow(t, 2) + t);
-  const t1 = (-2 * Math.pow(t, 3) + 3 * Math.pow(t, 2));
-  const t2 = (Math.pow(t, 3) - Math.pow(t, 2));
+  // Second level
+  const p012 = interpolate(p01, p12, t);
+  const p123 = interpolate(p12, p23, t);
 
-  const x = h * h0.x + t0 * m0.x + t1 * h1.x + t2 * m1.x;
-  const y = h * h0.y + t0 * m0.y + t1 * h1.y + t2 * m1.y;
+  // Final level of 
+  const p0123 = interpolate(p012, p123, t);
 
-  return { x, y };
+  return p0123;
+}
+
+function interpolate(pA, pB, t) {
+  return {
+      x: (1 - t) * pA.x + t * pB.x,
+      y: (1 - t) * pA.y + t * pB.y
+  };
 }
 
 
@@ -111,19 +115,21 @@ for(let i = 0; i < total; i += gap){
     let point; 
 
     if (i < seg1) {
-        point = calculateHermitePoint(i / seg1, ab0, ab1, ab2, ab3);
+        point = calculateBezierPoint(i / seg1, ab0, ab1, ab2, ab3);
     } else if (i < seg2+seg1) {
-        point = calculateHermitePoint((i - seg1) / seg2, bc0, bc1, bc2, bc3);
+        point = calculateBezierPoint((i - seg1) / seg2, bc0, bc1, bc2, bc3);
     } else if (i < seg3+seg1+seg2) {
-        point = calculateHermitePoint((i - seg1 - seg2) / seg3, cd0, cd1, cd2, cd3);
+        point = calculateBezierPoint((i - seg1 - seg2) / seg3, cd0, cd1, cd2, cd3);
     } else if (i < seg4+seg1+seg2+seg3) {
-        point = calculateHermitePoint((i - seg1 - seg2 - seg3) / seg4, de0, de1, de2, de3);
+        point = calculateBezierPoint((i - seg1 - seg2 - seg3) / seg4, de0, de1, de2, de3);
     } else {
-        point = calculateHermitePoint((i - seg1 - seg2 - seg3 - seg4) / seg5, ea0, ea1, ea2, ea3);
+        point = calculateBezierPoint((i - seg1 - seg2 - seg3 - seg4) / seg5, ea0, ea1, ea2, ea3);
     }
 
     x = point.x;
     y = point.y;
-    context.fillRect(x, y, 5, 5); 
+    context.beginPath(); 
+    context.arc(x, y, 2.5, 0, Math.PI * 2, true); 
+    context.fill(); 
 }
 
