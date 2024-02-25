@@ -9,37 +9,23 @@ let table = [];
 let points = [];
 
 function findClosestIndex(table, targetDistance) {
-    let left = 0;
-    let right = table.length - 1;
-  
-    while (left <= right) {
-      let mid = Math.floor((left + right) / 2);
-      if (table[mid] === targetDistance) {
-        return mid;
-      } else if (table[mid] < targetDistance) {
-        left = mid + 1;
-      } else {
-        right = mid - 1;
-      }
+    if (table.length === 0) return -1;
+    
+    let closestIndex = 0;
+    let smallestDiff = Math.abs(table[0] - targetDistance);
+    
+    for (let i = 1; i < table.length; i++) {
+        let currentDiff = Math.abs(table[i] - targetDistance);
+        
+        if (currentDiff < smallestDiff) {
+            closestIndex = i;
+            smallestDiff = currentDiff;
+        }
     }
-  
-    let leftDiff = targetDistance - table[right];
-    let rightDiff = table[left] - targetDistance;
-  
-    return (leftDiff < rightDiff) ? right : left;
-  }
-
-function calculateHermitePoint(u, H0, T0, T1, H1) {
-    const h00 = 2 * u * u * u - 3 * u * u + 1;
-    const h10 = u * u * u - 2 * u * u + u;
-    const h01 = -2 * u * u * u + 3 * u * u;
-    const h11 = u * u * u - u * u;
-
-    const x = h00 * H0.x + h10 * T0.x + h01 * H1.x + h11 * T1.x;
-    const y = h00 * H0.y + h10 * T0.y + h01 * H1.y + h11 * T1.y;
-
-    return { x, y };
+    
+    return closestIndex;
 }
+
 
 function calculateBezierPoint(t, H0, T0, T1, H1) {
     // Convert Hermite parameters to Bezier control points
